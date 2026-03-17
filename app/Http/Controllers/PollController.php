@@ -28,32 +28,31 @@ class PollController extends Controller
 
     // Submit Vote
     public function vote(Request $request)
-    {
-
-        $request->validate([
-            'choice_id' => 'required'
-        ]);
-
-        $response = Http::post('http://127.0.0.1:8001/api/vote/', [
-
-            'choice_id' => $request->choice_id,
-            'user_id' => Session::get('user_id')
-
-        ]);
-
-        $data = $response->json();
-
-        if(isset($data['error']))
         {
-            return back()->with('error',$data['error']);
-        }
+            $request->validate([
+                'choice_id' => 'required',
+                'question_index' => 'required|integer'
+            ]);
 
-        if(isset($data['message']))
-        {
-            return back()->with('message',$data['message']);
-        }
+            $response = Http::post('http://127.0.0.1:8001/api/vote/', [
+                'choice_id' => $request->choice_id,
+                'user_id' => Session::get('user_id')
+            ]);
 
-        return back()->with('error','Something went wrong');
-    }
+            $data = $response->json();
+
+            // Pass back message and question index
+            $flashData = ['question_index' => $request->question_index];
+
+            if(isset($data['error'])) {
+                return back()->with(array_merge(['error' => $data['error']], $flashData));
+            }
+
+            if(isset($data['message'])) {
+                return back()->with(array_merge(['message' => $data['message']], $flashData));
+            }
+
+            return back()->with(array_merge(['error' => 'Something went wrong'], $flashData));
+        }
 
 }

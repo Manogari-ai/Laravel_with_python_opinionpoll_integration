@@ -36,8 +36,7 @@ class AuthController extends Controller
         Session::put('user_id',$data['user_id']);
         Session::put('email',$data['email']);
 
-        return redirect('/poll');
-
+         return redirect()->route('poll.index');
     }
 
     public function register(Request $request)
